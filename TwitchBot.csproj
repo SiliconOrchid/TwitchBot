@@ -1,8 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>74fc09f9-aa6e-4692-a868-1b25512598a8</UserSecretsId>
   </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="TwitchLib" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables " Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets " Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.1.4" />
 
+    <PackageReference Include="NewtonSoft.Json" Version="12.0.3" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
