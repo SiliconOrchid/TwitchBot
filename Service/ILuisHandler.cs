@@ -1,11 +1,10 @@
-using System;
 using System.Threading.Tasks;
+using TwitchBot.Models;
 
 namespace TwitchBot.Service
 {
     public interface ILuisHandler
     {
-        Task<string> MakeRequest(string utterance);
-        Tuple<string,string> ParseResponse(string json);
+        Task<IntentResponse> GetIntent(string utterance);
     } 
 }

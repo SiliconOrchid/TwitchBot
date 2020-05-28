@@ -17,6 +17,8 @@ namespace  TwitchBot.Service
     {
         private TwitchConfiguration _twitchConfiguration;
         private ChatConfiguration _chatConfiguration;
+        private LuisChatResponses _luisChatResponses;
+        private ILuisHandler _luisHandler;
 
 
         private readonly ConnectionCredentials _connectionCredentials;
@@ -29,11 +31,18 @@ namespace  TwitchBot.Service
 
         public TwitchChatBot(
             IOptions<TwitchConfiguration> twitchConfiguration,
-            IOptions<ChatConfiguration> chatConfiguration
+            IOptions<ChatConfiguration> chatConfiguration,
+            IOptions<LuisChatResponses> luisChatResponses,
+            ILuisHandler luisHandler
+   
+
             )
         {
             _twitchConfiguration = twitchConfiguration.Value ?? throw new ArgumentNullException(nameof(twitchConfiguration));
             _chatConfiguration = chatConfiguration.Value ?? throw new ArgumentNullException(nameof(chatConfiguration));
+            _luisChatResponses = luisChatResponses.Value ?? throw new ArgumentNullException(nameof(luisChatResponses));
+
+            _luisHandler = luisHandler ?? throw new ArgumentNullException(nameof(luisHandler));
 
             _connectionCredentials = new ConnectionCredentials(_twitchConfiguration.BotUserName, _twitchConfiguration.BotToken);
         }
@@ -110,8 +119,59 @@ namespace  TwitchBot.Service
             else
             {
 
+                client.SendMessage(_twitchConfiguration.ChannelName, HandleLuisChat(e.ChatMessage.Message));
             }
         }
+
+        private string  HandleLuisChat(string chatMessage)
+        {
+                // Run async method in this sync method  (read https://cpratt.co/async-tips-tricks/)
+                IntentResponse intentResponse = AsyncHelper.RunSync(() => _luisHandler.GetIntent(chatMessage));  
+           
+                if (intentResponse.Certainty > 80)
+                {
+                    switch (intentResponse.Intent.ToLower())
+                    {
+                        case "compliment":
+                            return _luisChatResponses.Compliment;
+
+                        case "greeting":
+                            return _luisChatResponses.Greeting;
+
+                        case "hostile":
+                            return _luisChatResponses.Hostile;
+
+                        case "howdoesbotwork":
+                            return _luisChatResponses.Howdoesbotwork;
+
+                        case "howlongprogramming":
+                            return _luisChatResponses.Howlongprogramming;
+
+                        case "lowlongstream":
+                            return _luisChatResponses.Howlongstream;
+
+                        case "innapropriate":
+                            return _luisChatResponses.Innapropriate;
+
+                        case "provideurllink":
+                            return _luisChatResponses.Provideurllink;
+
+                        case "whatareyoudoing":
+                            return _luisChatResponses.Whatareyoudoing;                                                                                                                
+
+                        case "whatlanguage":
+                            return _luisChatResponses.Whatlanguage;
+
+                        case "whendoyoustream":
+                            return _luisChatResponses.Whendoyoustream;                               
+
+                    }
+                }
+
+                return string.Empty;
+
+        }
+
 
         private async Task<TimeSpan?> GetUpTime()
         {

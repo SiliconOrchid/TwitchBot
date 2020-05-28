@@ -22,7 +22,13 @@ namespace TwitchBot.Service
 
         }
 
-        public async Task<string> MakeRequest(string utterance)
+        public async Task<IntentResponse> GetIntent(string utterance)
+        {
+            //Todo null checking and other robustness improvements
+            return ParseResponse(await MakeRequest(utterance));
+        }
+
+        private async Task<string> MakeRequest(string utterance)
         {
             var client = new HttpClient();
             var queryString = HttpUtility.ParseQueryString(string.Empty);
@@ -51,14 +57,16 @@ namespace TwitchBot.Service
 
 
         //https://dotnetcoretutorials.com/2019/09/11/how-to-parse-json-in-net-core/
-        public Tuple<string,string> ParseResponse(string json)
+        private IntentResponse ParseResponse(string json)
         {
             var parsedJObject = JObject.Parse(json);
             string topIntent = parsedJObject.SelectToken("$.prediction.topIntent").Value<string>();
 
-            string topIntentScore = parsedJObject.SelectToken($"$.prediction.intents.{topIntent}.score").Value<string>();
+            //todo use tryparse for robustness
+            decimal topIntentScore = decimal.Parse(parsedJObject.SelectToken($"$.prediction.intents.{topIntent}.score").Value<string>());
 
-            return new Tuple<string, string>(topIntent,topIntentScore);
+            return new IntentResponse{Intent=topIntent,Certainty=topIntentScore};
+
         }
 
     }

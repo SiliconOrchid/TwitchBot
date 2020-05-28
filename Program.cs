@@ -27,6 +27,7 @@ namespace TwitchBot
                 .Configure<LuisConfiguration>(Configuration.GetSection(nameof(LuisConfiguration)))
                 .Configure<TwitchConfiguration>(Configuration.GetSection(nameof(TwitchConfiguration)))
                 .Configure<ChatConfiguration>(Configuration.GetSection(nameof(ChatConfiguration)))
+                .Configure<LuisChatResponses>(Configuration.GetSection(nameof(LuisChatResponses)))
                 .AddOptions()
                 //.AddLogging()
                 //.AddSingleton<ISecretRevealer, SecretRevealer>()
@@ -36,14 +37,13 @@ namespace TwitchBot
 
             var serviceProvider = services.BuildServiceProvider();
 
-            var luisHandler = serviceProvider.GetService<ILuisHandler>(); //todo: shouldn't this be an ILuisHandler?
+            // var luisHandler = serviceProvider.GetService<ILuisHandler>(); 
 
-            var jsonResponse = await luisHandler.MakeRequest("what are you doing?");
+            // var jsonResponse = await luisHandler.MakeRequest("what are we working on today");
 
-            var parseResponse = luisHandler.ParseResponse(jsonResponse);
+            // var parseResponse = luisHandler.ParseResponse(jsonResponse);
 
-            Console.WriteLine($"{jsonResponse}");    
-            Console.WriteLine($"{parseResponse.Item1} - {parseResponse.Item2}");  
+            // Console.WriteLine($"{parseResponse.Item1} - {parseResponse.Item2}");  
 
 
             Console.ReadLine();
