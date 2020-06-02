@@ -35,25 +35,28 @@ namespace TwitchBot
 
                 .AddSingleton<ITwitchChatBotService, TwitchChatBotService>()
                 .AddSingleton<ILuisService, LuisService>()
+                .AddSingleton<ICosmosDbService, CosmosDbService>()
                 .BuildServiceProvider();
 
             var serviceProvider = services.BuildServiceProvider();
 
+
+            ICosmosDbService cosmosDbService  = serviceProvider.GetService<ICosmosDbService>();
+            await cosmosDbService.DoStuff();
+            Console.ReadLine();
+
             // var luisHandler = serviceProvider.GetService<ILuisHandler>(); 
-
             // IntentResponse intentResponse  = await luisHandler.GetIntent("what are we working on today");
-
             // Console.WriteLine($"{intentResponse.Intent} - {intentResponse.Certainty}");  
-
-
             //Console.ReadLine();
 
-            ITwitchChatBotService twitchChatBot = serviceProvider.GetService<ITwitchChatBotService>();    
-            twitchChatBot.Connect();
 
-
-            Console.ReadLine();
-            twitchChatBot.Disconnect();
+            //// connect chatbot -------------------------------------------------------------------
+            //ITwitchChatBotService twitchChatBot = serviceProvider.GetService<ITwitchChatBotService>();    
+            //twitchChatBot.Connect();
+            //Console.ReadLine();
+            //twitchChatBot.Disconnect();
+            //// end connect chatbot -------------------------------------------------------------------
         }
     }
 }

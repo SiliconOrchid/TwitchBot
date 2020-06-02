@@ -5,15 +5,9 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UserSecretsId>74fc09f9-aa6e-4692-a868-1b25512598a8</UserSecretsId>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="Service\CosmosDbService.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service\CosmosDbService.cs" />
-  </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.9.1" />
+    <PackageReference Include="Azure.Cosmos" Version="4.0.0-preview3" />
     <PackageReference Include="TwitchLib" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.4" />

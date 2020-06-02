@@ -6,7 +6,8 @@ using System.Web;
 
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using TwitchBot.Models;
+using TwitchBot.Models.Chat;
+using TwitchBot.Models.Configuration;
 
 namespace TwitchBot.Service
 {

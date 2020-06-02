@@ -9,7 +9,8 @@ using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
-using TwitchBot.Models;
+using TwitchBot.Models.Chat;
+using TwitchBot.Models.Configuration;
 
 namespace  TwitchBot.Service
 {

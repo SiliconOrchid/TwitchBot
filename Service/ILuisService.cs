@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using TwitchBot.Models;
+using TwitchBot.Models.Chat;
 
 namespace TwitchBot.Service
 {
