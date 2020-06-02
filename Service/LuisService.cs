@@ -34,6 +34,9 @@ namespace TwitchBot.Service
 
         private async Task<string> MakeRequest(string utterance)
         {
+            //https://eu.luis.ai/
+
+
             var queryString = HttpUtility.ParseQueryString(string.Empty);
 
             // The request header contains your subscription key
@@ -68,10 +71,12 @@ namespace TwitchBot.Service
             //todo use tryparse for robustness
             decimal topIntentScore = decimal.Parse(parsedJObject.SelectToken($"$.prediction.intents.{topIntent}.score").Value<string>());
 
-            return new IntentResponse{Intent=topIntent,Certainty=topIntentScore};
+            string embeddedUrlIfAvailable = parsedJObject.SelectToken($"$.prediction.entities.url[0]").Value<string>();
+
+            return new IntentResponse{Intent=topIntent,Certainty=topIntentScore, EmbeddedUrl = embeddedUrlIfAvailable };
 
         }
 
     }
-    
+
 }

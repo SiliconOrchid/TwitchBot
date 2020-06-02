@@ -37,13 +37,19 @@ namespace TwitchBot.Service
             _cosmosClient = new CosmosClient(_cosmosDbConfiguration.EndpointUri, _cosmosDbConfiguration.AuthorizationKey);
         }
 
-        public async Task DoStuff()
-        {
+        //public async Task DoStuff()
+        //{
 
+        //    await CreateDatabaseAsync();
+        //    await CreateContainerAsync();
+        //    await AddItemsToContainerAsync();
+        //    await QueryItemsAsync();
+        //}
+
+        public async Task StartupDatabase()
+        {
             await CreateDatabaseAsync();
             await CreateContainerAsync();
-            await AddItemsToContainerAsync();
-            await QueryItemsAsync();
         }
 
 
@@ -72,18 +78,18 @@ namespace TwitchBot.Service
 
 
         /// <summary>
-        /// Add Family items to the container
+        /// Add items to the container
         /// </summary>
-        private async Task AddItemsToContainerAsync()
+        public async Task AddItemsToContainerAsync(ChatLink chatLink)
         {
 
-            ChatLink chatLink = new ChatLink
-            {
-                Id = new Guid().ToString(),
-                TwitchUserName = "MrTest",
-                SharedUrl = "https://blogs.siliconorchid.com",
-                DateShared = DateTime.UtcNow
-            };
+            //ChatLink chatLink = new ChatLink
+            //{
+            //    Id = Guid.NewGuid().ToString(),
+            //    TwitchUserName = "MrTest",
+            //    SharedUrl = "https://blogs.siliconorchid.com",
+            //    DateShared = DateTime.UtcNow
+            //};
 
             CosmosContainer container = _cosmosClient.GetContainer(_cosmosDbConfiguration.DatabaseId, _cosmosDbConfiguration.ContainerId);
             try

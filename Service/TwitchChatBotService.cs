@@ -11,6 +11,7 @@ using TwitchLib.Client.Models;
 
 using TwitchBot.Models.Chat;
 using TwitchBot.Models.Configuration;
+using TwitchBot.Models.ExtractedData;
 
 namespace  TwitchBot.Service
 {
@@ -19,7 +20,9 @@ namespace  TwitchBot.Service
         private readonly TwitchConfiguration _twitchConfiguration;
         private readonly ChatConfiguration _chatConfiguration;
         private readonly LuisChatResponses _luisChatResponses;
-        private readonly ILuisService _luisHandler;
+        private readonly ILuisService _luisService;
+        private readonly ICosmosDbService _cosmosDbService;
+
 
         private readonly TwitchClient _twitchClient;
 
@@ -37,14 +40,16 @@ namespace  TwitchBot.Service
             IOptions<TwitchConfiguration> twitchConfiguration,
             IOptions<ChatConfiguration> chatConfiguration,
             IOptions<LuisChatResponses> luisChatResponses,
-            ILuisService luisHandler
+            ILuisService luisService,
+            ICosmosDbService cosmosDbService
             )
         {
             _twitchConfiguration = twitchConfiguration.Value ?? throw new ArgumentNullException(nameof(twitchConfiguration));
             _chatConfiguration = chatConfiguration.Value ?? throw new ArgumentNullException(nameof(chatConfiguration));
             _luisChatResponses = luisChatResponses.Value ?? throw new ArgumentNullException(nameof(luisChatResponses));
 
-            _luisHandler = luisHandler ?? throw new ArgumentNullException(nameof(luisHandler));
+            _cosmosDbService = cosmosDbService ?? throw new ArgumentNullException(nameof(cosmosDbService));
+            _luisService = luisService ?? throw new ArgumentNullException(nameof(luisService));
 
             _connectionCredentials = new ConnectionCredentials(_twitchConfiguration.BotUserName, _twitchConfiguration.BotToken);
 
@@ -118,17 +123,20 @@ namespace  TwitchBot.Service
             }
 
 
+            
+
             else
             {
 
-                _twitchClient.SendMessage(_twitchConfiguration.ChannelName, HandleLuisChat(e.ChatMessage.Message));
+                _twitchClient.SendMessage(_twitchConfiguration.ChannelName, HandleLuisChat(e));
             }
         }
 
-        private string  HandleLuisChat(string chatMessage)
+        private string  HandleLuisChat(TwitchLib.Client.Events.OnMessageReceivedArgs e)
         {
+
                 // Run async method in this sync method  (read https://cpratt.co/async-tips-tricks/)
-                IntentResponse intentResponse = AsyncHelper.RunSync(() => _luisHandler.GetIntent(chatMessage));  
+                IntentResponse intentResponse = AsyncHelper.RunSync(() => _luisService.GetIntent(e.ChatMessage.Message));  
            
                 string intent = intentResponse.Intent.ToLower();
 
@@ -162,6 +170,7 @@ namespace  TwitchBot.Service
                             return _luisChatResponses.Innapropriate;
 
                         case "provideurllink":
+
                             return _luisChatResponses.Provideurllink;
 
                         case "whatareyoudoing":
@@ -182,7 +191,22 @@ namespace  TwitchBot.Service
                     }
                 }
 
-                return string.Empty;
+            if (!string.IsNullOrEmpty(intentResponse.EmbeddedUrl))
+            {
+
+                ChatLink chatLink = new ChatLink
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    DateShared = DateTime.UtcNow,
+                    SharedUrl = intentResponse.EmbeddedUrl,
+                    TwitchUserName = e.ChatMessage.Username
+                };
+
+                _cosmosDbService.AddItemsToContainerAsync(chatLink);
+            }
+
+
+            return string.Empty;
 
         }
 

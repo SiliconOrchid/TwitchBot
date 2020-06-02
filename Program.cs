@@ -41,22 +41,30 @@ namespace TwitchBot
             var serviceProvider = services.BuildServiceProvider();
 
 
-            ICosmosDbService cosmosDbService  = serviceProvider.GetService<ICosmosDbService>();
-            await cosmosDbService.DoStuff();
+            //ICosmosDbService cosmosDbService  = serviceProvider.GetService<ICosmosDbService>();
+            //await cosmosDbService.StartupDatabase();
+
+
+            // --------------- test cosmos directly --------------------
+            //ICosmosDbService cosmosDbService  = serviceProvider.GetService<ICosmosDbService>();
+            //await cosmosDbService.DoStuff();
+            //Console.ReadLine();
+            // --------------- test cosmos directly --------------------
+
+
+
+            //var luisHandler = serviceProvider.GetService<ILuisService>();
+            //IntentResponse intentResponse = await luisHandler.GetIntent("i found this interesting website blogs.siliconorchid.com");
+            //Console.WriteLine($"{intentResponse.Intent} - {intentResponse.Certainty}");
+            //Console.ReadLine();
+
+
+            //connect chatbot -------------------------------------------------------------------
+           ITwitchChatBotService twitchChatBot = serviceProvider.GetService<ITwitchChatBotService>();
+            twitchChatBot.Connect();
             Console.ReadLine();
-
-            // var luisHandler = serviceProvider.GetService<ILuisHandler>(); 
-            // IntentResponse intentResponse  = await luisHandler.GetIntent("what are we working on today");
-            // Console.WriteLine($"{intentResponse.Intent} - {intentResponse.Certainty}");  
-            //Console.ReadLine();
-
-
-            //// connect chatbot -------------------------------------------------------------------
-            //ITwitchChatBotService twitchChatBot = serviceProvider.GetService<ITwitchChatBotService>();    
-            //twitchChatBot.Connect();
-            //Console.ReadLine();
-            //twitchChatBot.Disconnect();
-            //// end connect chatbot -------------------------------------------------------------------
+            twitchChatBot.Disconnect();
+            //end connect chatbot------------------------------------------------------------------ -
         }
     }
 }
