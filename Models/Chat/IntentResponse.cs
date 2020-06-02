@@ -1,4 +1,4 @@
-namespace TwitchBot.Models
+namespace TwitchBot.Models.Chat
 {
     public class IntentResponse
     {

@@ -1,5 +1,5 @@
 
-namespace TwitchBot.Models
+namespace TwitchBot.Models.Configuration
 {
     public class ChatConfiguration
     {

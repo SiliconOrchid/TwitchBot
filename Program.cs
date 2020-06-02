@@ -5,7 +5,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using TwitchBot.Service;
-using TwitchBot.Models;
+using TwitchBot.Models.Chat;
+using TwitchBot.Models.Configuration;
 
 
 namespace TwitchBot
@@ -28,32 +29,31 @@ namespace TwitchBot
                 .Configure<TwitchConfiguration>(Configuration.GetSection(nameof(TwitchConfiguration)))
                 .Configure<ChatConfiguration>(Configuration.GetSection(nameof(ChatConfiguration)))
                 .Configure<LuisChatResponses>(Configuration.GetSection(nameof(LuisChatResponses)))
+                .Configure<CosmosDbConfiguration>(Configuration.GetSection(nameof(CosmosDbConfiguration)))
+
                 .AddOptions()
-                //.AddLogging()
-                //.AddSingleton<ISecretRevealer, SecretRevealer>()
-                .AddSingleton<ITwitchChatBot, TwitchChatBot>()
-                .AddSingleton<ILuisHandler, LuisHandler>()
+
+                .AddSingleton<ITwitchChatBotService, TwitchChatBotService>()
+                .AddSingleton<ILuisService, LuisService>()
                 .BuildServiceProvider();
 
             var serviceProvider = services.BuildServiceProvider();
 
             // var luisHandler = serviceProvider.GetService<ILuisHandler>(); 
 
-            // var jsonResponse = await luisHandler.MakeRequest("what are we working on today");
+            // IntentResponse intentResponse  = await luisHandler.GetIntent("what are we working on today");
 
-            // var parseResponse = luisHandler.ParseResponse(jsonResponse);
+            // Console.WriteLine($"{intentResponse.Intent} - {intentResponse.Certainty}");  
 
-            // Console.WriteLine($"{parseResponse.Item1} - {parseResponse.Item2}");  
+
+            //Console.ReadLine();
+
+            ITwitchChatBotService twitchChatBot = serviceProvider.GetService<ITwitchChatBotService>();    
+            twitchChatBot.Connect();
 
 
             Console.ReadLine();
-
-            // TwitchChatBot twitchChatBot = serviceProvider.GetService<ITwitchChatBot>();    
-            // twitchChatBot.Connect();
-
-
-            // Console.ReadLine();
-            // twitchChatBot.Disconnect();
+            twitchChatBot.Disconnect();
         }
     }
 }

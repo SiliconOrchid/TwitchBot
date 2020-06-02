@@ -3,7 +3,7 @@ using TwitchBot.Models;
 
 namespace TwitchBot.Service
 {
-    public interface ILuisHandler
+    public interface ILuisService
     {
         Task<IntentResponse> GetIntent(string utterance);
     } 

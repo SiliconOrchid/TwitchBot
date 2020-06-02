@@ -13,29 +13,30 @@ using TwitchBot.Models;
 
 namespace  TwitchBot.Service
 {
-    public class TwitchChatBot : ITwitchChatBot
+    public class TwitchChatBotService : ITwitchChatBotService
     {
-        private TwitchConfiguration _twitchConfiguration;
-        private ChatConfiguration _chatConfiguration;
-        private LuisChatResponses _luisChatResponses;
-        private ILuisHandler _luisHandler;
+        private readonly TwitchConfiguration _twitchConfiguration;
+        private readonly ChatConfiguration _chatConfiguration;
+        private readonly LuisChatResponses _luisChatResponses;
+        private readonly ILuisService _luisHandler;
+
+        private readonly TwitchClient _twitchClient;
 
 
         private readonly ConnectionCredentials _connectionCredentials;
-        private TwitchClient client;
+
+
         private readonly TwitchAPI twitchAPI = new TwitchAPI();
 
         private string[] BotUsers = new string[] { "SO-Bot", "streamelements" }; // maintain a list of known bots, so we don't try and interact with them
 
         private List<string> UsersOnline = new List<string>();
 
-        public TwitchChatBot(
+        public TwitchChatBotService(
             IOptions<TwitchConfiguration> twitchConfiguration,
             IOptions<ChatConfiguration> chatConfiguration,
             IOptions<LuisChatResponses> luisChatResponses,
-            ILuisHandler luisHandler
-   
-
+            ILuisService luisHandler
             )
         {
             _twitchConfiguration = twitchConfiguration.Value ?? throw new ArgumentNullException(nameof(twitchConfiguration));
@@ -45,46 +46,46 @@ namespace  TwitchBot.Service
             _luisHandler = luisHandler ?? throw new ArgumentNullException(nameof(luisHandler));
 
             _connectionCredentials = new ConnectionCredentials(_twitchConfiguration.BotUserName, _twitchConfiguration.BotToken);
+
+            _twitchClient  = new TwitchClient();
         }
 
 
         private void InizializeBot()
         {
-            client = new TwitchClient();
+            _twitchClient.OnLog += Client_OnLog;
+            _twitchClient.OnConnectionError += Client_OnConnectionError;
+            _twitchClient.OnMessageReceived += Client_OnMessageReceived;
+            _twitchClient.OnWhisperReceived += Client_OnWhisperReceived;
+            _twitchClient.OnUserTimedout += Client_OnUserTimedout;
+            _twitchClient.OnNewSubscriber += Client_OnNewSubscriber;
+            _twitchClient.OnUserJoined += Client_OnUserJoined;
+            _twitchClient.OnUserLeft += Client_OnUserLeft;
 
-            client.OnLog += Client_OnLog;
-            client.OnConnectionError += Client_OnConnectionError;
-            client.OnMessageReceived += Client_OnMessageReceived;
-            client.OnWhisperReceived += Client_OnWhisperReceived;
-            client.OnUserTimedout += Client_OnUserTimedout;
-            client.OnNewSubscriber += Client_OnNewSubscriber;
-            client.OnUserJoined += Client_OnUserJoined;
-            client.OnUserLeft += Client_OnUserLeft;
+            _twitchClient.Initialize(_connectionCredentials, _twitchConfiguration.ChannelName);
+            _twitchClient.Connect();
 
-            client.Initialize(_connectionCredentials, _twitchConfiguration.ChannelName);
-            client.Connect();
-
-            client.OnConnected += Client_OnConnected;
+            _twitchClient.OnConnected += Client_OnConnected;
         }
 
         private void Client_OnConnected(object sender, TwitchLib.Client.Events.OnConnectedArgs e)
         {
-            client.SendMessage(_twitchConfiguration.ChannelName, $"Hi to everyone.");
+            _twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"Hi to everyone.");
         }
 
         private void Client_OnNewSubscriber(object sender, TwitchLib.Client.Events.OnNewSubscriberArgs e)
         {
-            client.SendMessage(_twitchConfiguration.ChannelName, $"Thank you for the subscription {e.Subscriber.DisplayName}!!! I really appreciate it!");
+            _twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"Thank you for the subscription {e.Subscriber.DisplayName}!!! I really appreciate it!");
         }
 
         private void Client_OnUserTimedout(object sender, TwitchLib.Client.Events.OnUserTimedoutArgs e)
         {
-            client.SendMessage(_twitchConfiguration.ChannelName, $"User {e.UserTimeout.Username} timed out.");
+            _twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"User {e.UserTimeout.Username} timed out.");
         }
 
         private void Client_OnWhisperReceived(object sender, TwitchLib.Client.Events.OnWhisperReceivedArgs e)
         {
-            //client.SendWhisper(e.WhisperMessage.Username, $"your said: { e.WhisperMessage.Message}");
+            //_twitchClient.SendWhisper(e.WhisperMessage.Username, $"your said: { e.WhisperMessage.Message}");
         }
 
         private void Client_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
@@ -92,34 +93,34 @@ namespace  TwitchBot.Service
             if (e.ChatMessage.Message.StartsWith("!uptime", StringComparison.InvariantCultureIgnoreCase))
             {
                 var upTime = GetUpTime().Result;
-                client.SendMessage(_twitchConfiguration.ChannelName, upTime?.ToString() ?? "Offline");
+                _twitchClient.SendMessage(_twitchConfiguration.ChannelName, upTime?.ToString() ?? "Offline");
             }
             else if (e.ChatMessage.Message.StartsWith("!project", StringComparison.InvariantCultureIgnoreCase))
             {
-                client.SendMessage(_twitchConfiguration.ChannelName, $"We're working on {_chatConfiguration.ProjectDescription}.");
+                _twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"We're working on {_chatConfiguration.ProjectDescription}.");
             }
             else if (e.ChatMessage.Message.StartsWith("!instagram", StringComparison.InvariantCultureIgnoreCase))
             {
-                client.SendMessage(_twitchConfiguration.ChannelName, $"Follow me on Instagram: {_chatConfiguration.Instagram}");
+                _twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"Follow me on Instagram: {_chatConfiguration.Instagram}");
             }
             else if (e.ChatMessage.Message.StartsWith("!twitter", StringComparison.InvariantCultureIgnoreCase))
             {
-                client.SendMessage(_twitchConfiguration.ChannelName, $"Follow me on Twitter: {_chatConfiguration.Twitter}");
+                _twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"Follow me on Twitter: {_chatConfiguration.Twitter}");
             }
             else if (e.ChatMessage.Message.StartsWith("!blog", StringComparison.InvariantCultureIgnoreCase))
             {
-                client.SendMessage(_twitchConfiguration.ChannelName, $"My blog: {_chatConfiguration.Blog}");
+                _twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"My blog: {_chatConfiguration.Blog}");
             }
             else if (e.ChatMessage.Message.StartsWith("!playlist", StringComparison.InvariantCultureIgnoreCase))
             {
-                client.SendMessage(_twitchConfiguration.ChannelName, $"Playlist for my live on Twitch: {_chatConfiguration.SpotifyPlaylist}");
+                _twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"Playlist for my live on Twitch: {_chatConfiguration.SpotifyPlaylist}");
             }
 
 
             else
             {
 
-                client.SendMessage(_twitchConfiguration.ChannelName, HandleLuisChat(e.ChatMessage.Message));
+                _twitchClient.SendMessage(_twitchConfiguration.ChannelName, HandleLuisChat(e.ChatMessage.Message));
             }
         }
 
@@ -128,9 +129,15 @@ namespace  TwitchBot.Service
                 // Run async method in this sync method  (read https://cpratt.co/async-tips-tricks/)
                 IntentResponse intentResponse = AsyncHelper.RunSync(() => _luisHandler.GetIntent(chatMessage));  
            
-                if (intentResponse.Certainty > 80)
+                string intent = intentResponse.Intent.ToLower();
+
+                //string myintent = "hostile";
+
+                decimal certaintyThreshold = 0.4m;
+                
+                if (intentResponse.Certainty > certaintyThreshold)
                 {
-                    switch (intentResponse.Intent.ToLower())
+                    switch (intent)
                     {
                         case "compliment":
                             return _luisChatResponses.Compliment;
@@ -163,7 +170,13 @@ namespace  TwitchBot.Service
                             return _luisChatResponses.Whatlanguage;
 
                         case "whendoyoustream":
-                            return _luisChatResponses.Whendoyoustream;                               
+                            return _luisChatResponses.Whendoyoustream;       
+
+                       case "whichide":
+                            return _luisChatResponses.WhichIDE;
+
+                        case "whoareyou":
+                            return _luisChatResponses.Whoareyou;                                                       
 
                     }
                 }
@@ -203,7 +216,7 @@ namespace  TwitchBot.Service
 
             try
             {
-                //client.SendMessage(TwitchInfo.ChannelName, $"Welcome on my channel, { e.Username }.");
+                //_twitchClient.SendMessage(TwitchInfo.ChannelName, $"Welcome on my channel, { e.Username }.");
 
                 UsersOnline.Add(e.Username);
             }

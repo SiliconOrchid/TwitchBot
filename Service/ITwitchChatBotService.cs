@@ -1,8 +1,6 @@
-using System.Threading.Tasks;
-
 namespace TwitchBot.Service
 {
-    public interface ITwitchChatBot
+    public interface ITwitchChatBotService
     {
         void Connect();
         void Disconnect();

@@ -1,5 +1,5 @@
 
-namespace TwitchBot.Models
+namespace TwitchBot.Models.Chat
 {
     public class LuisChatResponses
     {
@@ -19,5 +19,9 @@ namespace TwitchBot.Models
         public string Whatareyoudoing {get;set;}
         public string Whatlanguage {get;set;}
         public string Whendoyoustream {get;set;}
+
+        public string WhichIDE {get;set;}
+        public string Whoareyou {get;set;}  
+
     }
 }

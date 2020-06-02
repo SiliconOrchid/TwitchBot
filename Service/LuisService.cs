@@ -12,14 +12,17 @@ namespace TwitchBot.Service
 {
     //https://docs.microsoft.com/en-us/azure/cognitive-services/luis/luis-get-started-get-intent-from-rest?pivots=programming-language-csharp
 
-    public class LuisHandler : ILuisHandler
+    public class LuisService : ILuisService
     {
         private LuisConfiguration _luisConfiguration;
 
-        public LuisHandler(IOptions<LuisConfiguration> luisConfiguration)
-        {
-          _luisConfiguration = luisConfiguration.Value ?? throw new ArgumentNullException(nameof(luisConfiguration));
+        private HttpClient _httpClient;
 
+        public LuisService(IOptions<LuisConfiguration> luisConfiguration)
+        {
+            _luisConfiguration = luisConfiguration.Value ?? throw new ArgumentNullException(nameof(luisConfiguration));
+
+            _httpClient = new HttpClient();
         }
 
         public async Task<IntentResponse> GetIntent(string utterance)
@@ -30,11 +33,10 @@ namespace TwitchBot.Service
 
         private async Task<string> MakeRequest(string utterance)
         {
-            var client = new HttpClient();
             var queryString = HttpUtility.ParseQueryString(string.Empty);
 
             // The request header contains your subscription key
-            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _luisConfiguration.AppKey);
+            _httpClient.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", _luisConfiguration.AppKey);
 
             // The "q" parameter contains the utterance to send to LUIS
             queryString["query"] = utterance;
@@ -47,7 +49,7 @@ namespace TwitchBot.Service
 
             var endpointUri = $"{_luisConfiguration.EndPoint}luis/prediction/v3.0/apps/{_luisConfiguration.AppId}/slots/production/predict?{queryString}";
 
-            var httpResponse = await client.GetAsync(endpointUri);
+            var httpResponse = await _httpClient.GetAsync(endpointUri);
 
             var strResponseContent = await httpResponse.Content.ReadAsStringAsync();
 
