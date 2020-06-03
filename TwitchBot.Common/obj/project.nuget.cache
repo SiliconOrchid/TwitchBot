@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "CaKXPeNds2RdUJ5ePT3fRRgeyt03gNc5BxRs8vN81EIzKKD7rLxIoApIfACDkzhk3j9ZBFy6XrfcQcHIpgdCcg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Jim\\source\\repos\\TwitchBot\\TwitchBot.Common\\TwitchBot.Common.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Jim\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\Jim\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
