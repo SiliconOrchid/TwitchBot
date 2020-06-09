@@ -12,12 +12,18 @@ namespace TwitchBot.Common.Data
 {
     public class ApplicationDbContext : IdentityDbContext
     {
+        public DbSet<TwitchUserChat> TwitchUserChats { get; set; }
+
+        public DbSet<TwitchNewSubscriber> TwitchNewSubscribers { get; set; }
+
+        public DbSet<TwitchUserAttendanceEvent> TwitchUserAttendanceEvents { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        public DbSet<TwitchUser> TwitchUsers { get; set; }
+
 
 
 
@@ -30,7 +36,9 @@ namespace TwitchBot.Common.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            TwitchUserEntityConfiguration.Configure(modelBuilder);
+            TwitchUserChatEntityConfiguration.Configure(modelBuilder);
+            TwitchNewSubscriberEntityConfiguration.Configure(modelBuilder);
+            TwitchUserAttendanceEventEntityConfiguration.Configure(modelBuilder);
         }
 
         /// <summary>

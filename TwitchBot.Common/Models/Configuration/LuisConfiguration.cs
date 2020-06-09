@@ -6,5 +6,7 @@ namespace TwitchBot.Common.Models.Configuration
         public string AppId {get; set;}
         public string AppKey {get;set;}
         public string EndPoint {get;set;}
+        public string LuisChatCertaintyThreshold { get; set; }
+        
     }
 }

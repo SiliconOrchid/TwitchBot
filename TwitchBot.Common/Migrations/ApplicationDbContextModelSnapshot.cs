@@ -215,7 +215,7 @@ namespace TwitchBot.Common.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("TwitchBot.Common.Models.Entity.TwitchUser", b =>
+            modelBuilder.Entity("TwitchBot.Common.Models.Entity.TwitchNewSubscriber", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -228,14 +228,88 @@ namespace TwitchBot.Common.Migrations
                     b.Property<DateTime>("Modified")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("TwitchUserName")
+                    b.Property<string>("TwitchUserDisplayName")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
                     b.HasKey("Id");
 
-                    b.ToTable("TwitchUser","TwitchBot");
+                    b.ToTable("TwitchNewSubscriber","TwitchBot");
+                });
+
+            modelBuilder.Entity("TwitchBot.Common.Models.Entity.TwitchUserAttendanceEvent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TwitchUserDisplayName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<bool>("UserJoined")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("UserLeft")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TwitchUserAttendanceEvent","TwitchBot");
+                });
+
+            modelBuilder.Entity("TwitchBot.Common.Models.Entity.TwitchUserChat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ChatMessage")
+                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(4096);
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExtractedUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("LuisCertainty")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("LuisIntent")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Modified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TwitchUserDisplayName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("TwitchUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.Property<string>("TwitchUserType")
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TwitchUserChat","TwitchBot");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

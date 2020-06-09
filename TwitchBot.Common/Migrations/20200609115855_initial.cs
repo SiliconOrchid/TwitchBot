@@ -7,6 +7,9 @@ namespace TwitchBot.Common.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "TwitchBot");
+
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -44,6 +47,62 @@ namespace TwitchBot.Common.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TwitchNewSubscriber",
+                schema: "TwitchBot",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Created = table.Column<DateTime>(nullable: false),
+                    Modified = table.Column<DateTime>(nullable: false),
+                    TwitchUserDisplayName = table.Column<string>(maxLength: 100, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TwitchNewSubscriber", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TwitchUserAttendanceEvent",
+                schema: "TwitchBot",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Created = table.Column<DateTime>(nullable: false),
+                    Modified = table.Column<DateTime>(nullable: false),
+                    TwitchUserDisplayName = table.Column<string>(maxLength: 100, nullable: false),
+                    UserJoined = table.Column<bool>(nullable: false),
+                    UserLeft = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TwitchUserAttendanceEvent", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TwitchUserChat",
+                schema: "TwitchBot",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Created = table.Column<DateTime>(nullable: false),
+                    Modified = table.Column<DateTime>(nullable: false),
+                    TwitchUserId = table.Column<string>(maxLength: 50, nullable: false),
+                    TwitchUserType = table.Column<string>(maxLength: 50, nullable: true),
+                    TwitchUserDisplayName = table.Column<string>(maxLength: 100, nullable: false),
+                    ChatMessage = table.Column<string>(maxLength: 4096, nullable: true),
+                    ExtractedUrl = table.Column<string>(nullable: true),
+                    LuisIntent = table.Column<string>(nullable: true),
+                    LuisCertainty = table.Column<decimal>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TwitchUserChat", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -208,6 +267,18 @@ namespace TwitchBot.Common.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "TwitchNewSubscriber",
+                schema: "TwitchBot");
+
+            migrationBuilder.DropTable(
+                name: "TwitchUserAttendanceEvent",
+                schema: "TwitchBot");
+
+            migrationBuilder.DropTable(
+                name: "TwitchUserChat",
+                schema: "TwitchBot");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

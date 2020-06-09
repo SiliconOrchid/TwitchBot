@@ -8,11 +8,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
-
+using TwitchBot.Agent.Services;
+using TwitchBot.Agent.Services.Interfaces;
 using TwitchBot.Common.Data;
-
-
+using TwitchBot.Common.Data.Repository.Interfaces;
+using TwitchBot.Common.Models.Chat;
+using TwitchBot.Common.Models.Configuration;
+using TwitchBot.Common.Models.Entity;
+using TwitchBot.Common.StartupExtensions;
 
 namespace TwitchBot.Agent
 {
@@ -29,28 +32,43 @@ namespace TwitchBot.Agent
 
             IServiceCollection services = new ServiceCollection();
 
-            services
-                .AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")))
-
-                //.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                    //.AddEntityFrameworkStores<ApplicationDbContext>()
 
 
 
-                //.Configure<LuisConfiguration>(Configuration.GetSection(nameof(LuisConfiguration)))
-                //.Configure<TwitchConfiguration>(Configuration.GetSection(nameof(TwitchConfiguration)))
-                //.Configure<ChatConfiguration>(Configuration.GetSection(nameof(ChatConfiguration)))
-                //.Configure<LuisChatResponses>(Configuration.GetSection(nameof(LuisChatResponses)))
-                //.Configure<CosmosDbConfiguration>(Configuration.GetSection(nameof(CosmosDbConfiguration)))
 
-                .AddOptions()
 
-                //.AddSingleton<ITwitchChatBotService, TwitchChatBotService>()
-                //.AddSingleton<ILuisService, LuisService>()
-                //.AddSingleton<ICosmosDbService, CosmosDbService>()
-                .BuildServiceProvider();
+
+            //.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            //.AddEntityFrameworkStores<ApplicationDbContext>()
+
+            services.Configure<FeatureSwitchesConfig>(Configuration.GetSection(nameof(FeatureSwitchesConfig) ));
+            services.Configure<MemoryCachingConfig>(Configuration.GetSection(nameof(MemoryCachingConfig)));
+
+            services.Configure<LuisConfiguration>(Configuration.GetSection(nameof(LuisConfiguration)));
+            services.Configure<TwitchConfiguration>(Configuration.GetSection(nameof(TwitchConfiguration)));
+            services.Configure<ChatConfiguration>(Configuration.GetSection(nameof(ChatConfiguration)));
+            services.Configure<LuisChatResponses>(Configuration.GetSection(nameof(LuisChatResponses)));
+            //.Configure<CosmosDbConfiguration>(Configuration.GetSection(nameof(CosmosDbConfiguration)))
+
+            services.AddOptions();
+            services.AddMemoryCache();
+
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(
+                Configuration.GetConnectionString("DefaultConnection")));
+
+
+
+            services.AddSingleton<ITwitchChatBotService, TwitchChatBotService>();
+            services.AddSingleton<ILuisService, LuisService>();
+            services.AddSingleton<IChatMessageService, ChatMessageService>();
+            services.AddCommonServices(); // defined in "common" projects
+
+
+
+            //.AddSingleton<ICosmosDbService, CosmosDbService>()
+            //services.BuildServiceProvider();
 
             var serviceProvider = services.BuildServiceProvider();
 
@@ -72,12 +90,22 @@ namespace TwitchBot.Agent
             //Console.ReadLine();
 
 
-            ////connect chatbot -------------------------------------------------------------------
-            //ITwitchChatBotService twitchChatBot = serviceProvider.GetService<ITwitchChatBotService>();
-            //twitchChatBot.Connect();
-            //Console.ReadLine();
-            //twitchChatBot.Disconnect();
-            ////end connect chatbot------------------------------------------------------------------ -
+            //connect chatbot -------------------------------------------------------------------
+            ITwitchChatBotService twitchChatBot = serviceProvider.GetService<ITwitchChatBotService>();
+            twitchChatBot.Connect();
+            Console.ReadLine();
+            twitchChatBot.Disconnect();
+            //end connect chatbot------------------------------------------------------------------ -
+            ///
+
+            //var twitchUser = new TwitchUserChat { TwitchUserName = "mrblobby2" };
+
+            //var twitchUserRepository = serviceProvider.GetService<ITwitchUserChatRepository>();
+
+            //await twitchUserRepository.CreateAsync(twitchUser);
+
+
+
         }
     }
 }

@@ -16,5 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\TwitchBot.Common\TwitchBot.Common.csproj" />
   </ItemGroup>
+  
+  
 
 </Project>

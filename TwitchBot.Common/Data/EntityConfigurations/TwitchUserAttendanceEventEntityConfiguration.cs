@@ -3,7 +3,7 @@ using TwitchBot.Common.Models.Entity;
 
 namespace TwitchBot.Common.Data.EntityConfigurations
 {
-    public class TwitchUserEntityConfiguration
+    public class TwitchUserAttendanceEventEntityConfiguration
     {
         public static void Configure(ModelBuilder modelBuilder)
         {
@@ -13,15 +13,19 @@ namespace TwitchBot.Common.Data.EntityConfigurations
             // TIP : ENSURE THAT this configuration is registered in "Context/IMCIntegrationDBContext/OnModelCreating"
             // TIP : EF Configuration is partly done in the "BaseEntity" (which is purpose of 'BaseEntityConfiguration.SetUp ...' below) - be aware that fields like the primary key and other common fields are configured there and not in this file.
 
-            modelBuilder.Entity<TwitchUser>(b =>
+
+            modelBuilder.Entity<TwitchUserAttendanceEvent>(b =>
             {
-                modelBuilder = BaseEntityConfiguration.SetUp<TwitchUser>(modelBuilder, "TwitchUser", "TwitchBot");
+                modelBuilder = BaseEntityConfiguration.SetUp<TwitchUserAttendanceEvent>(modelBuilder, "TwitchUserAttendanceEvent", "TwitchBot");
 
 
                 #region ---- Entity Main Properties  ----   
-                b.Property(c => c.TwitchUserName)
+                b.Property(c => c.TwitchUserDisplayName)
                     .IsRequired()
                     .HasMaxLength(100);
+
+
+
                 #endregion
 
                 #region ---- Entity Indicies  ----     
@@ -29,5 +33,6 @@ namespace TwitchBot.Common.Data.EntityConfigurations
             });
 
         }
+
     }
 }
