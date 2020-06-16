@@ -8,6 +8,8 @@ using Microsoft.Extensions.Options;
 using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
+using TwitchLib.Client.Events;
+
 
 using TwitchBot.Agent.Services.Interfaces;
 using TwitchBot.Common.Models.Chat;
@@ -15,7 +17,6 @@ using TwitchBot.Common.Models.Configuration;
 using TwitchBot.Common.Models.ExtractedData;
 using TwitchBot.Common.Data.Repository.Interfaces;
 using TwitchBot.Common.Models.Entity;
-using TwitchLib.Client.Events;
 
 namespace TwitchBot.Agent.Services
 {
