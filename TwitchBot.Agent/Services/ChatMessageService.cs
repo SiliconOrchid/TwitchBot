@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-
+using TwitchBot.Agent.Rules;
 using TwitchBot.Agent.Services.Interfaces;
 using TwitchBot.Common.Models.Chat;
 using TwitchBot.Common.Models.Configuration;
@@ -10,47 +12,38 @@ namespace TwitchBot.Agent.Services
 {
     public class ChatMessageService : IChatMessageService
     {
+        private readonly IEnumerable<IChatMessageRule> _listChatMessageRules;
         private readonly ChatConfiguration _chatConfiguration;
         private readonly LuisChatResponses _luisChatResponses;
 
         public ChatMessageService(
             IOptions<LuisChatResponses> luisChatResponses,
-            IOptions<ChatConfiguration> chatConfiguration
+            IOptions<ChatConfiguration> chatConfiguration,
+            IEnumerable<IChatMessageRule> listChatMessageRules
             )
         {
             _luisChatResponses = luisChatResponses.Value ?? throw new ArgumentNullException(nameof(luisChatResponses));
             _chatConfiguration = chatConfiguration.Value ?? throw new ArgumentNullException(nameof(chatConfiguration));
-
+            _listChatMessageRules = listChatMessageRules.ToArray() ?? throw new ArgumentNullException(nameof(listChatMessageRules));
 
         }
 
 
-        public string HandleBotCommands(string chatMessage)
+        public string HandleBotCommands(TwitchLib.Client.Events.OnMessageReceivedArgs e)
         {
-            if (chatMessage.StartsWith("!project", StringComparison.InvariantCultureIgnoreCase))
+            IChatMessageRule chatmessageRule = _listChatMessageRules.FirstOrDefault(rule => rule.IsTextMatched(e.ChatMessage.Message.Trim()));
+
+            if (chatmessageRule != null)
             {
-                return $"We're working on {_chatConfiguration.ProjectDescription}.";
+                return chatmessageRule.ReturnedMessage(e);
             }
 
-            if (chatMessage.StartsWith("!instagram", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return $"Follow me on Instagram: {_chatConfiguration.Instagram}";
-            }
 
-            if (chatMessage.StartsWith("!twitter", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return $"Follow me on Twitter: {_chatConfiguration.Twitter}";
-            }
-
-            if (chatMessage.StartsWith("!blog", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return $"My blog: {_chatConfiguration.Blog}";
-            }
-
-            if (chatMessage.StartsWith("!playlist", StringComparison.InvariantCultureIgnoreCase))
-            {
-                return $"Playlist for my live on Twitch: {_chatConfiguration.SpotifyPlaylist}";
-            }
+            //if (e.ChatMessage.Message.StartsWith("!uptime", StringComparison.InvariantCultureIgnoreCase))
+            //{
+            //    var upTime = GetUpTime().Result;
+            //    _twitchLibClient.SendMessage(_twitchConfiguration.ChannelName, upTime?.ToString() ?? "Offline");
+            //}
 
             return string.Empty;
         }

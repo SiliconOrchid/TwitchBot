@@ -4,7 +4,7 @@ namespace TwitchBot.Agent.Services.Interfaces
 {
     public interface IChatMessageService
     {
-        string HandleBotCommands(string chatMessage);
+        string HandleBotCommands(TwitchLib.Client.Events.OnMessageReceivedArgs e);
         string MapLuisIntentToResponse(IntentResponse intentResponse);
 
     }

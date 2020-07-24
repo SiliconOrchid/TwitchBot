@@ -82,21 +82,20 @@ namespace TwitchBot.Agent.Services
 
         private void Client_OnConnected(object sender, TwitchLib.Client.Events.OnConnectedArgs e)
         {
-            _twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"Hi to everyone.");
+            //_twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"Hi to everyone.");
         }
 
         private void Client_OnNewSubscriber(object sender, TwitchLib.Client.Events.OnNewSubscriberArgs e)
         {
             AddSubscriberRecordToDb(e);
-
-            _twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"Thank you for the subscription {e.Subscriber.DisplayName}!!! I really appreciate it!");
+            //_twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"Thank you for the subscription {e.Subscriber.DisplayName}!!! I really appreciate it!");
         }
 
 
 
         private void Client_OnUserTimedout(object sender, TwitchLib.Client.Events.OnUserTimedoutArgs e)
         {
-            _twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"User {e.UserTimeout.Username} timed out.");
+            //_twitchClient.SendMessage(_twitchConfiguration.ChannelName, $"User {e.UserTimeout.Username} timed out.");
         }
 
         private void Client_OnWhisperReceived(object sender, TwitchLib.Client.Events.OnWhisperReceivedArgs e)
@@ -106,9 +105,9 @@ namespace TwitchBot.Agent.Services
 
         private void Client_OnMessageReceived(object sender, TwitchLib.Client.Events.OnMessageReceivedArgs e)
         {
-            string botCommandResponse = _chatMessageService.HandleBotCommands(e.ChatMessage.Message.Trim());
+            string botMessageResponse = _chatMessageService.HandleBotCommands(e);
 
-            if (string.IsNullOrEmpty(botCommandResponse))  // do something with luis
+            if (string.IsNullOrEmpty(botMessageResponse))  // nothing from bot-commands, so try doing something with LUIS
             {
                 // Run async method in this sync method  (read https://cpratt.co/async-tips-tricks/)
                 IntentResponse intentResponse = AsyncHelper.RunSync(() => _luisService.GetIntentAsync(e.ChatMessage.Message.Trim()));
@@ -123,16 +122,15 @@ namespace TwitchBot.Agent.Services
 
                 if (intentResponse.Certainty > certaintyThreshold)
                 {
-                    string luisMappedResponse = _chatMessageService.MapLuisIntentToResponse(intentResponse);
-                    _twitchClient.SendMessage(_twitchConfiguration.ChannelName, luisMappedResponse);
+                    botMessageResponse = _chatMessageService.MapLuisIntentToResponse(intentResponse);
                 }
 
                 AddTwitchUserChatRecordToDb(e, intentResponse);
             }
-            else // do something with explicit bot commands
-            {
-                _twitchClient.SendMessage(_twitchConfiguration.ChannelName, botCommandResponse);
-            }
+
+
+            _twitchClient.SendMessage(_twitchConfiguration.ChannelName, botMessageResponse);
+
 
         }
 
