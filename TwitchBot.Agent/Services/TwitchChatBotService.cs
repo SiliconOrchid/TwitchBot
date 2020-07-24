@@ -107,10 +107,12 @@ namespace TwitchBot.Agent.Services
         {
             string botMessageResponse = _chatMessageService.HandleBotCommands(e);
 
+            IntentResponse intentResponse = new IntentResponse { Certainty = null, EmbeddedUrl = null, Intent = null }; // create with an empty default, for bot-command messages (those that are not fed through LUIS)
+
             if (string.IsNullOrEmpty(botMessageResponse))  // nothing from bot-commands, so try doing something with LUIS
             {
                 // Run async method in this sync method  (read https://cpratt.co/async-tips-tricks/)
-                IntentResponse intentResponse = AsyncHelper.RunSync(() => _luisService.GetIntentAsync(e.ChatMessage.Message.Trim()));
+                intentResponse = AsyncHelper.RunSync(() => _luisService.GetIntentAsync(e.ChatMessage.Message.Trim()));
 
                 decimal certaintyThreshold;
 
@@ -125,10 +127,10 @@ namespace TwitchBot.Agent.Services
                     botMessageResponse = _chatMessageService.MapLuisIntentToResponse(intentResponse);
                 }
 
-                AddTwitchUserChatRecordToDb(e, intentResponse);
+
             }
 
-
+            AddTwitchUserChatRecordToDb(e, intentResponse);
             _twitchClient.SendMessage(_twitchConfiguration.ChannelName, botMessageResponse);
 
 

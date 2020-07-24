@@ -14,7 +14,7 @@
 
         public string LuisIntent { get; set; }
 
-        public decimal LuisCertainty { get; set; }
+        public decimal? LuisCertainty { get; set; }
 
     }
 }

@@ -10,8 +10,8 @@ using TwitchBot.Common.Data;
 namespace TwitchBot.Common.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200609115855_initial")]
-    partial class initial
+    [Migration("20200724104701_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -286,7 +286,7 @@ namespace TwitchBot.Common.Migrations
                     b.Property<string>("ExtractedUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("LuisCertainty")
+                    b.Property<decimal?>("LuisCertainty")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("LuisIntent")

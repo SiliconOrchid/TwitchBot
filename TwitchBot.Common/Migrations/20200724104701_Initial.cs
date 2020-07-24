@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TwitchBot.Common.Migrations
 {
-    public partial class initial : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -98,7 +98,7 @@ namespace TwitchBot.Common.Migrations
                     ChatMessage = table.Column<string>(maxLength: 4096, nullable: true),
                     ExtractedUrl = table.Column<string>(nullable: true),
                     LuisIntent = table.Column<string>(nullable: true),
-                    LuisCertainty = table.Column<decimal>(nullable: false)
+                    LuisCertainty = table.Column<decimal>(nullable: true)
                 },
                 constraints: table =>
                 {

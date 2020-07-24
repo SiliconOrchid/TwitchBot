@@ -284,7 +284,7 @@ namespace TwitchBot.Common.Migrations
                     b.Property<string>("ExtractedUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal>("LuisCertainty")
+                    b.Property<decimal?>("LuisCertainty")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("LuisIntent")
